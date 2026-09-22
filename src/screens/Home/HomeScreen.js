@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, ScrollView, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import { useSelector, useDispatch } from 'react-redux';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from '../../constants/colors';
 import { SPACING, RADIUS } from '../../constants/theme';
 import { PROFILE_TYPES } from '../../constants/profileTypes';
@@ -14,6 +15,7 @@ import { setActiveProfile } from '../../redux/slices/profileSlice';
 
 export const HomeScreen = ({ navigation }) => {
   const dispatch = useDispatch();
+  const insets = useSafeAreaInsets();
   const [searchQuery, setSearchQuery] = useState('');
   const profiles = useSelector((state) => state.profiles.list);
   const templates = useSelector((state) => state.templates.catalog);
@@ -33,7 +35,14 @@ export const HomeScreen = ({ navigation }) => {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={[
+        styles.contentContainer,
+        { paddingTop: Math.max(insets.top, 16) + SPACING.sm },
+      ]}
+      showsVerticalScrollIndicator={false}
+    >
       {/* Top Header matching poster (Hello, Sanketh! 👋 + Bell icon) */}
       <View style={styles.topHeader}>
         <View>

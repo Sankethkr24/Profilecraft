@@ -1,4 +1,5 @@
 import React from 'react';
+import { StatusBar } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Provider } from 'react-redux';
 import { store } from './src/redux/store';
@@ -8,6 +9,7 @@ const App = () => {
   return (
     <Provider store={store}>
       <SafeAreaProvider>
+        <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" translucent={false} />
         <AppNavigator />
       </SafeAreaProvider>
     </Provider>

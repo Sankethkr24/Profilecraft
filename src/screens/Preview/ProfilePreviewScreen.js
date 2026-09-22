@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import { useSelector } from 'react-redux';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from '../../constants/colors';
 import { SPACING, RADIUS } from '../../constants/theme';
 import { AppHeader } from '../../components/common/AppHeader';
@@ -14,6 +15,7 @@ import { ElegantTemplate } from '../../components/templates/ElegantTemplate';
 import { pdfService } from '../../services/pdfService';
 
 export const ProfilePreviewScreen = ({ route, navigation }) => {
+  const insets = useSafeAreaInsets();
   const { templateId } = route.params || {};
 
   const activeProfile = useSelector(
@@ -34,6 +36,14 @@ export const ProfilePreviewScreen = ({ route, navigation }) => {
       case 'royal-theme-03':
       default:
         return <ElegantTemplate profile={activeProfile} />;
+    }
+  };
+
+  const handleBack = () => {
+    if (navigation.canGoBack && navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      navigation.navigate('MainTabs');
     }
   };
 
@@ -71,7 +81,7 @@ export const ProfilePreviewScreen = ({ route, navigation }) => {
     <View style={styles.container}>
       <AppHeader
         title="Preview"
-        onBack={() => navigation.goBack()}
+        onBack={handleBack}
         rightAction={
           <AppButton
             title="Edit"
@@ -88,7 +98,7 @@ export const ProfilePreviewScreen = ({ route, navigation }) => {
       <View style={styles.previewCanvas}>{renderTemplate()}</View>
 
       {/* Floating Bottom Action Bar matching poster Screen 3 */}
-      <View style={styles.bottomBar}>
+      <View style={[styles.bottomBar, { paddingBottom: Math.max(insets.bottom, SPACING.sm + 4) }]}>
         <AppButton
           title={exporting ? 'Exporting...' : 'Save as PDF'}
           variant="primary"

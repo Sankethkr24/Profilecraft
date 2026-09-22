@@ -62,11 +62,19 @@ export const ProfileFormScreen = ({ route, navigation }) => {
     navigation.navigate('Templates', { profileId: profilePayload.id });
   };
 
+  const handleBack = () => {
+    if (navigation.canGoBack && navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      navigation.navigate('MainTabs');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <AppHeader
         title={existingProfile ? 'Edit Profile' : 'Create Profile'}
-        onBack={() => navigation.goBack()}
+        onBack={handleBack}
       />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {/* Photo Picker */}

@@ -13,9 +13,17 @@ export const ProfileTypeScreen = ({ navigation }) => {
     navigation.navigate('ProfileForm', { type: typeId });
   };
 
+  const handleBack = () => {
+    if (navigation.canGoBack && navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      navigation.navigate('MainTabs');
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <AppHeader title="Choose Profile Type" onBack={() => navigation.goBack()} />
+      <AppHeader title="Choose Profile Type" onBack={handleBack} />
       <ScrollView contentContainerStyle={styles.content}>
         <Typography variant="body" color={COLORS.textSecondary} style={styles.subtitle}>
           Select the purpose of your profile to load targeted fields and optimized templates.

@@ -17,6 +17,7 @@ export const AppNavigator = () => {
         <Stack.Screen name="MainTabs" component={BottomTabNavigator} />
         <Stack.Screen name="ProfileType" component={ProfileTypeScreen} />
         <Stack.Screen name="ProfileForm" component={ProfileFormScreen} />
+        <Stack.Screen name="Templates" component={TemplateGalleryScreen} />
         <Stack.Screen name="TemplateGallery" component={TemplateGalleryScreen} />
         <Stack.Screen name="ProfilePreview" component={ProfilePreviewScreen} />
       </Stack.Navigator>

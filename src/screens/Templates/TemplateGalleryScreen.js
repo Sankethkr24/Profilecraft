@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from '../../constants/colors';
 import { SPACING, RADIUS } from '../../constants/theme';
 import { TEMPLATE_CATEGORIES } from '../../constants/templatesCatalog';
@@ -17,6 +18,7 @@ import { saveProfile } from '../../redux/slices/profileSlice';
 
 export const TemplateGalleryScreen = ({ route, navigation }) => {
   const dispatch = useDispatch();
+  const insets = useSafeAreaInsets();
   const { profileId } = route.params || {};
 
   const activeCategory = useSelector((state) => state.templates.selectedCategory);
@@ -40,6 +42,14 @@ export const TemplateGalleryScreen = ({ route, navigation }) => {
     dispatch(toggleFavoriteTemplate(id));
   };
 
+  const handleBack = () => {
+    if (navigation.canGoBack && navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      navigation.navigate('MainTabs');
+    }
+  };
+
   const handleUseTemplate = () => {
     if (activeProfile) {
       const updatedProfile = { ...activeProfile, templateId: selectedTemplateId };
@@ -50,7 +60,7 @@ export const TemplateGalleryScreen = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-      <AppHeader title="Matrimony Templates" onBack={() => navigation.goBack()} />
+      <AppHeader title="Matrimony Templates" onBack={handleBack} />
 
       {/* Horizontal Category Pills */}
       <View style={styles.pillContainer}>
@@ -83,7 +93,7 @@ export const TemplateGalleryScreen = ({ route, navigation }) => {
       </ScrollView>
 
       {/* Sticky Bottom Action Button */}
-      <View style={styles.bottomBar}>
+      <View style={[styles.bottomBar, { paddingBottom: Math.max(insets.bottom, SPACING.md) }]}>
         <AppButton
           title="Use This Template"
           variant="primary"

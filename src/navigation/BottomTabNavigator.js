@@ -2,6 +2,7 @@ import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Feather from 'react-native-vector-icons/Feather';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from '../constants/colors';
 import { SPACING } from '../constants/theme';
 import { HomeScreen } from '../screens/Home/HomeScreen';
@@ -24,13 +25,22 @@ const CustomFabButton = ({ onPress }) => (
 );
 
 export const BottomTabNavigator = () => {
+  const insets = useSafeAreaInsets();
+  const bottomInset = insets.bottom > 0 ? insets.bottom : 8;
+
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: COLORS.primary,
         tabBarInactiveTintColor: COLORS.textMuted,
-        tabBarStyle: styles.tabBar,
+        tabBarStyle: [
+          styles.tabBar,
+          {
+            height: 60 + bottomInset,
+            paddingBottom: bottomInset,
+          },
+        ],
         tabBarLabelStyle: styles.labelStyle,
       }}
     >
