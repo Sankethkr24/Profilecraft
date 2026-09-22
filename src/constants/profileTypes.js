@@ -1,0 +1,58 @@
+import { COLORS } from './colors';
+
+export const PROFILE_TYPES = [
+  {
+    id: 'matrimony',
+    title: 'Matrimony Profile',
+    subtitle: 'Personal & background details for match-making',
+    icon: 'heart',
+    iconType: 'Feather',
+    bgColor: COLORS.matrimonyTint,
+    accentColor: COLORS.matrimonyIcon,
+  },
+  {
+    id: 'professional',
+    title: 'Professional Profile',
+    subtitle: 'Resume & career summary for job seekers',
+    icon: 'briefcase',
+    iconType: 'Feather',
+    bgColor: COLORS.professionalTint,
+    accentColor: COLORS.professionalIcon,
+  },
+  {
+    id: 'student',
+    title: 'Student Profile',
+    subtitle: 'Academic background & achievements',
+    icon: 'award',
+    iconType: 'Feather',
+    bgColor: COLORS.studentTint,
+    accentColor: COLORS.studentIcon,
+  },
+  {
+    id: 'freelancer',
+    title: 'Freelancer Profile',
+    subtitle: 'Services, skills & client portfolio',
+    icon: 'user-check',
+    iconType: 'Feather',
+    bgColor: COLORS.freelancerTint,
+    accentColor: COLORS.freelancerIcon,
+  },
+  {
+    id: 'portfolio',
+    title: 'Personal Portfolio',
+    subtitle: 'Bio, highlights & custom introduction',
+    icon: 'file-text',
+    iconType: 'Feather',
+    bgColor: COLORS.portfolioTint,
+    accentColor: COLORS.portfolioIcon,
+  },
+  {
+    id: 'family',
+    title: 'Family Profile',
+    subtitle: 'Family details & lineage overview',
+    icon: 'users',
+    iconType: 'Feather',
+    bgColor: COLORS.familyTint,
+    accentColor: COLORS.familyIcon,
+  },
+];
