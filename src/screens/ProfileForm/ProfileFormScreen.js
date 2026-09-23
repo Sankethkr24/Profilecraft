@@ -40,9 +40,12 @@ export const ProfileFormScreen = ({ route, navigation }) => {
 
   const isMatrimony = type === 'matrimony' || existingProfile?.type === 'matrimony';
 
-  const onPickImage = () => {
-    // Demo avatar image uri toggle
-    setPhotoUri('https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400');
+  const handleImageSelected = (uri) => {
+    setPhotoUri(uri);
+  };
+
+  const handleImageRemoved = () => {
+    setPhotoUri(null);
   };
 
   const onSubmit = (data) => {
@@ -78,7 +81,11 @@ export const ProfileFormScreen = ({ route, navigation }) => {
       />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {/* Photo Picker */}
-        <ImagePickerField photoUri={photoUri} onPickImage={onPickImage} />
+        <ImagePickerField
+          photoUri={photoUri}
+          onImageSelected={handleImageSelected}
+          onImageRemoved={handleImageRemoved}
+        />
 
         {/* Personal Details */}
         <FormField
