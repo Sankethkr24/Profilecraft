@@ -33,46 +33,80 @@ export const ImagePickerField = ({ photoUri, onImageSelected, onImageRemoved }) 
   };
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity
-        activeOpacity={0.85}
-        style={[styles.avatarBox, !!photoUri && styles.avatarBoxFilled]}
-        onPress={() => setModalVisible(true)}
-      >
-        {photoUri ? (
-          <>
-            <Image source={{ uri: photoUri }} style={styles.image} resizeMode="cover" />
-            <View style={styles.editBadge}>
-              <Feather name="edit-2" size={13} color="#FFF" />
+    <View style={styles.cardContainer}>
+      <View style={styles.avatarSection}>
+        <TouchableOpacity
+          activeOpacity={0.85}
+          style={[styles.avatarBox, !!photoUri && styles.avatarBoxFilled]}
+          onPress={() => setModalVisible(true)}
+        >
+          {photoUri ? (
+            <>
+              <Image source={{ uri: photoUri }} style={styles.image} resizeMode="cover" />
+              <View style={styles.editBadge}>
+                <Feather name="camera" size={13} color="#FFF" />
+              </View>
+            </>
+          ) : (
+            <View style={styles.placeholder}>
+              <View style={styles.cameraIconCircle}>
+                <Feather name="camera" size={26} color={COLORS.primary} />
+              </View>
+              <View style={styles.addPlusBadge}>
+                <Feather name="plus" size={12} color="#FFF" />
+              </View>
             </View>
-          </>
-        ) : (
-          <View style={styles.placeholder}>
-            <View style={styles.cameraIconCircle}>
-              <Feather name="camera" size={24} color={COLORS.primary} />
-            </View>
-            <Typography variant="caption" color={COLORS.primary} bold style={styles.text}>
-              Add Photo
-            </Typography>
-          </View>
-        )}
-      </TouchableOpacity>
+          )}
+        </TouchableOpacity>
 
-      {photoUri && (
-        <View style={styles.actionLinks}>
-          <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.linkBtn}>
-            <Typography variant="caption" bold color={COLORS.primary}>
-              Change Photo
-            </Typography>
-          </TouchableOpacity>
-          <Typography variant="caption" color={COLORS.textMuted}> • </Typography>
-          <TouchableOpacity onPress={handleRemove} style={styles.linkBtn}>
-            <Typography variant="caption" bold color={COLORS.error}>
-              Remove
-            </Typography>
-          </TouchableOpacity>
+        <View style={styles.textDetails}>
+          <Typography variant="body" bold color={COLORS.textPrimary}>
+            {photoUri ? 'Profile Photo' : 'Upload Profile Picture'}
+          </Typography>
+          <Typography variant="caption" color={COLORS.textSecondary} style={styles.subHint}>
+            {photoUri
+              ? 'Tap avatar or buttons below to edit'
+              : 'Add a clear headshot to increase profile appeal'}
+          </Typography>
+
+          {photoUri ? (
+            <View style={styles.actionButtonsRow}>
+              <TouchableOpacity
+                onPress={() => setModalVisible(true)}
+                style={styles.changePill}
+                activeOpacity={0.7}
+              >
+                <Feather name="edit-2" size={12} color={COLORS.primary} style={styles.pillIcon} />
+                <Typography variant="caption" bold color={COLORS.primary}>
+                  Change
+                </Typography>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={handleRemove}
+                style={styles.removePill}
+                activeOpacity={0.7}
+              >
+                <Feather name="trash-2" size={12} color={COLORS.error} style={styles.pillIcon} />
+                <Typography variant="caption" bold color={COLORS.error}>
+                  Remove
+                </Typography>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <TouchableOpacity
+              onPress={() => setModalVisible(true)}
+              style={styles.uploadPromptPill}
+              activeOpacity={0.7}
+            >
+              <Feather name="upload" size={12} color={COLORS.primary} style={styles.pillIcon} />
+              <Typography variant="caption" bold color={COLORS.primary}>
+                Select Photo
+              </Typography>
+            </TouchableOpacity>
+          )}
         </View>
-      )}
+      </View>
 
       {/* Bottom Sheet Picker Modal */}
       <Modal
@@ -85,10 +119,10 @@ export const ImagePickerField = ({ photoUri, onImageSelected, onImageRemoved }) 
           <View style={styles.modalContent}>
             <View style={styles.modalHandle} />
             <Typography variant="h3" bold align="center" style={styles.modalTitle}>
-              Profile Picture
+              Upload Photo
             </Typography>
             <Typography variant="caption" align="center" color={COLORS.textSecondary} style={styles.modalSub}>
-              Choose an option to set your profile photo
+              Choose a photo source for your profile picture
             </Typography>
 
             <TouchableOpacity style={styles.modalOption} onPress={handleOpenGallery}>
@@ -100,7 +134,7 @@ export const ImagePickerField = ({ photoUri, onImageSelected, onImageRemoved }) 
                   Choose from Gallery
                 </Typography>
                 <Typography variant="caption" color={COLORS.textSecondary}>
-                  Select an existing photo from your library
+                  Select an existing portrait from library
                 </Typography>
               </View>
               <Feather name="chevron-right" size={18} color={COLORS.textMuted} />
@@ -115,7 +149,7 @@ export const ImagePickerField = ({ photoUri, onImageSelected, onImageRemoved }) 
                   Take Photo
                 </Typography>
                 <Typography variant="caption" color={COLORS.textSecondary}>
-                  Capture a new photo with camera
+                  Capture a fresh shot with your camera
                 </Typography>
               </View>
               <Feather name="chevron-right" size={18} color={COLORS.textMuted} />
@@ -131,7 +165,7 @@ export const ImagePickerField = ({ photoUri, onImageSelected, onImageRemoved }) 
                     Remove Current Photo
                   </Typography>
                   <Typography variant="caption" color={COLORS.textSecondary}>
-                    Clear this profile picture
+                    Clear photo and use default avatar
                   </Typography>
                 </View>
                 <Feather name="chevron-right" size={18} color={COLORS.textMuted} />
@@ -151,17 +185,30 @@ export const ImagePickerField = ({ photoUri, onImageSelected, onImageRemoved }) 
 };
 
 const styles = StyleSheet.create({
-  container: {
+  cardContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: RADIUS.lg,
+    padding: SPACING.md,
+    marginBottom: SPACING.md + 4,
+    borderWidth: 1,
+    borderColor: '#EDF2F7',
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  avatarSection: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: SPACING.md,
   },
   avatarBox: {
-    width: 108,
-    height: 108,
-    borderRadius: 54,
-    backgroundColor: '#F3F0FF',
+    width: 86,
+    height: 86,
+    borderRadius: 43,
+    backgroundColor: '#F5F3FF',
     borderWidth: 2,
-    borderColor: COLORS.primary,
+    borderColor: COLORS.primaryLight,
     borderStyle: 'dashed',
     justifyContent: 'center',
     alignItems: 'center',
@@ -171,20 +218,21 @@ const styles = StyleSheet.create({
     borderStyle: 'solid',
     borderWidth: 3,
     borderColor: COLORS.primary,
-    elevation: 4,
     shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.25,
     shadowRadius: 6,
+    elevation: 4,
   },
   image: {
     width: '100%',
     height: '100%',
-    borderRadius: 50,
+    borderRadius: 40,
   },
   placeholder: {
     alignItems: 'center',
     justifyContent: 'center',
+    position: 'relative',
   },
   cameraIconCircle: {
     width: 44,
@@ -193,34 +241,77 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 4,
     elevation: 2,
   },
-  text: {
-    marginTop: 2,
+  addPlusBadge: {
+    position: 'absolute',
+    bottom: -2,
+    right: -2,
+    backgroundColor: COLORS.primary,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: '#FFFFFF',
   },
   editBadge: {
     position: 'absolute',
-    bottom: 2,
-    right: 2,
+    bottom: 0,
+    right: 0,
     backgroundColor: COLORS.primary,
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
     borderColor: '#FFFFFF',
-    elevation: 4,
+    elevation: 3,
   },
-  actionLinks: {
+  textDetails: {
+    flex: 1,
+    marginLeft: SPACING.md,
+  },
+  subHint: {
+    marginTop: 2,
+    lineHeight: 16,
+  },
+  actionButtonsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: SPACING.xs + 2,
+    marginTop: SPACING.xs + 4,
+    gap: 8,
   },
-  linkBtn: {
-    paddingVertical: 2,
-    paddingHorizontal: 4,
+  changePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#EEF2FF',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: RADIUS.full,
+  },
+  removePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEE2E2',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: RADIUS.full,
+  },
+  uploadPromptPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    backgroundColor: '#EEF2FF',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: RADIUS.full,
+    marginTop: SPACING.xs + 4,
+  },
+  pillIcon: {
+    marginRight: 4,
   },
   modalOverlay: {
     flex: 1,
@@ -252,8 +343,8 @@ const styles = StyleSheet.create({
   modalOption: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: SPACING.sm + 2,
-    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.sm + 4,
+    paddingHorizontal: SPACING.sm + 2,
     backgroundColor: '#F8FAFC',
     borderRadius: RADIUS.md,
     marginBottom: SPACING.sm,
