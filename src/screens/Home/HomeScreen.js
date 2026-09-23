@@ -12,6 +12,7 @@ import { CategoryCard } from '../../components/profile/CategoryCard';
 import { ProfileItemCard } from '../../components/profile/ProfileItemCard';
 import { TemplateCard } from '../../components/templates/TemplateCard';
 import { setActiveProfile } from '../../redux/slices/profileSlice';
+import { toggleFavoriteTemplate } from '../../redux/slices/templateSlice';
 
 export const HomeScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -19,6 +20,7 @@ export const HomeScreen = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const profiles = useSelector((state) => state.profiles.list);
   const templates = useSelector((state) => state.templates.catalog);
+  const favorites = useSelector((state) => state.templates.favorites);
 
   const handleSelectCategory = (category) => {
     navigation.navigate('ProfileForm', { type: category.id });
@@ -87,6 +89,8 @@ export const HomeScreen = ({ navigation }) => {
           <View key={tpl.id} style={styles.templateCardWrapper}>
             <TemplateCard
               item={tpl}
+              isFavorite={favorites?.includes(tpl.id)}
+              onToggleFavorite={(id) => dispatch(toggleFavoriteTemplate(id))}
               onSelect={() => navigation.navigate('Templates', { templateId: tpl.id })}
             />
           </View>
@@ -169,7 +173,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.lg,
   },
   templateCardWrapper: {
-    width: 170,
+    width: 195,
     marginRight: SPACING.md,
   },
   recentSection: {

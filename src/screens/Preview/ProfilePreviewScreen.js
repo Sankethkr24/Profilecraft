@@ -30,8 +30,10 @@ export const ProfilePreviewScreen = ({ route, navigation }) => {
       case 'trad-classic-01':
         return <TraditionalTemplate profile={activeProfile} />;
       case 'elegant-modern-02':
+      case 'professional-resume-05':
         return <ModernTemplate profile={activeProfile} />;
       case 'minimal-clean-04':
+      case 'creative-portfolio-06':
         return <MinimalTemplate profile={activeProfile} />;
       case 'royal-theme-03':
       default:

@@ -80,14 +80,15 @@ export const TemplateGalleryScreen = ({ route, navigation }) => {
       <ScrollView contentContainerStyle={styles.gridContent} showsVerticalScrollIndicator={false}>
         <View style={styles.grid}>
           {filteredCatalog.map((item) => (
-            <TemplateCard
-              key={item.id}
-              item={item}
-              isSelected={selectedTemplateId === item.id}
-              isFavorite={favorites.includes(item.id)}
-              onSelect={handleSelectTemplate}
-              onToggleFavorite={handleToggleFav}
-            />
+            <View key={item.id} style={styles.gridItem}>
+              <TemplateCard
+                item={item}
+                isSelected={selectedTemplateId === item.id}
+                isFavorite={favorites.includes(item.id)}
+                onSelect={handleSelectTemplate}
+                onToggleFavorite={handleToggleFav}
+              />
+            </View>
           ))}
         </View>
       </ScrollView>
@@ -118,12 +119,16 @@ const styles = StyleSheet.create({
   },
   gridContent: {
     padding: SPACING.md,
-    paddingBottom: 90,
+    paddingBottom: 110,
   },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
+  },
+  gridItem: {
+    width: '48%',
+    marginBottom: SPACING.xs,
   },
   bottomBar: {
     position: 'absolute',
