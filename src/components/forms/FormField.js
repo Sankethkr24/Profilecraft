@@ -9,10 +9,11 @@ export const FormField = ({ control, name, rules, defaultValue = '', ...inputPro
       name={name}
       rules={rules}
       defaultValue={defaultValue}
-      render={({ field: { onChange, value }, fieldState: { error } }) => (
+      render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
         <AppInput
           value={value}
           onChangeText={onChange}
+          onBlur={onBlur}
           error={error?.message}
           {...inputProps}
         />

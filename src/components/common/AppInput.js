@@ -10,6 +10,8 @@ export const AppInput = ({
   required = false,
   value,
   onChangeText,
+  onFocus,
+  onBlur,
   placeholder,
   error,
   multiline = false,
@@ -22,6 +24,20 @@ export const AppInput = ({
   ...props
 }) => {
   const [isFocused, setIsFocused] = useState(false);
+
+  const handleFocus = (e) => {
+    setIsFocused(true);
+    if (onFocus) {
+      onFocus(e);
+    }
+  };
+
+  const handleBlur = (e) => {
+    setIsFocused(false);
+    if (onBlur) {
+      onBlur(e);
+    }
+  };
 
   const renderIcon = () => {
     if (!icon) return null;
@@ -52,7 +68,7 @@ export const AppInput = ({
       <View
         style={[
           styles.inputWrapper,
-          isFocused && styles.focused,
+          isFocused ? styles.focused : styles.unfocused,
           !!error && styles.errorBorder,
           multiline && { height: 'auto', minHeight: 96, alignItems: 'flex-start' },
         ]}
@@ -60,16 +76,16 @@ export const AppInput = ({
         {icon && <View style={styles.iconContainer}>{renderIcon()}</View>}
 
         <TextInput
+          {...props}
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
           placeholderTextColor="#94A3B8"
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
           multiline={multiline}
           numberOfLines={numberOfLines}
           style={[styles.input, multiline && styles.multilineInput, inputStyle]}
-          {...props}
         />
 
         {rightElement && <View style={styles.rightElement}>{rightElement}</View>}
@@ -111,22 +127,18 @@ const styles = StyleSheet.create({
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F8FAFC',
-    borderWidth: 1.2,
-    borderColor: '#E2E8F0',
+    borderWidth: 1.5,
     borderRadius: RADIUS.md,
     paddingHorizontal: SPACING.md,
     height: 50,
   },
+  unfocused: {
+    backgroundColor: '#F8FAFC',
+    borderColor: '#E2E8F0',
+  },
   focused: {
     backgroundColor: '#FFFFFF',
     borderColor: COLORS.primary,
-    borderWidth: 1.5,
-    shadowColor: COLORS.primary,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.12,
-    shadowRadius: 6,
-    elevation: 2,
   },
   errorBorder: {
     borderColor: COLORS.error,

@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
   TextInput,
-  Text,
+  Keyboard,
+  Platform,
 } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -46,6 +47,19 @@ export const ProfileFormScreen = ({ route, navigation }) => {
   const activeType = type || existingProfile?.type || 'professional';
   const isMatrimony = activeType === 'matrimony';
   const isStudent = activeType === 'student';
+
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+    const showSub = Keyboard.addListener(showEvent, () => setKeyboardVisible(true));
+    const hideSub = Keyboard.addListener(hideEvent, () => setKeyboardVisible(false));
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   const { control, handleSubmit } = useForm({
     defaultValues: {
@@ -155,8 +169,10 @@ export const ProfileFormScreen = ({ route, navigation }) => {
       <ScrollView
         contentContainerStyle={[
           styles.content,
-          { paddingBottom: insets.bottom + 90 },
+          { paddingBottom: keyboardVisible ? insets.bottom + 20 : insets.bottom + 100 },
         ]}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
         showsVerticalScrollIndicator={false}
       >
         {/* Stepper & Category Pill */}
@@ -476,23 +492,34 @@ export const ProfileFormScreen = ({ route, navigation }) => {
             </View>
           </View>
         </SectionContainer>
-      </ScrollView>
 
-      {/* Floating Bottom Action Bar */}
-      <View
-        style={[
-          styles.bottomBar,
-          { paddingBottom: Math.max(insets.bottom, SPACING.md) },
-        ]}
-      >
+        {/* Scroll End Submit Button */}
         <AppButton
           title="Continue to Templates →"
           variant="primary"
           size="lg"
           onPress={handleSubmit(onSubmit)}
-          style={styles.submitBtn}
+          style={styles.scrollSubmitBtn}
         />
-      </View>
+      </ScrollView>
+
+      {/* Floating Bottom Action Bar (hidden when keyboard is open) */}
+      {!keyboardVisible && (
+        <View
+          style={[
+            styles.bottomBar,
+            { paddingBottom: Math.max(insets.bottom, SPACING.md) },
+          ]}
+        >
+          <AppButton
+            title="Continue to Templates →"
+            variant="primary"
+            size="lg"
+            onPress={handleSubmit(onSubmit)}
+            style={styles.submitBtn}
+          />
+        </View>
+      )}
     </View>
   );
 };
@@ -628,6 +655,11 @@ const styles = StyleSheet.create({
   },
   suggPlus: {
     marginRight: 3,
+  },
+  scrollSubmitBtn: {
+    marginTop: SPACING.sm,
+    marginBottom: SPACING.lg,
+    borderRadius: RADIUS.lg,
   },
   bottomBar: {
     position: 'absolute',
