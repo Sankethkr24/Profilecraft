@@ -1,12 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   ScrollView,
   StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  Keyboard,
-  Platform,
 } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,24 +12,18 @@ import Feather from 'react-native-vector-icons/Feather';
 import { COLORS } from '../../constants/colors';
 import { SPACING, RADIUS } from '../../constants/theme';
 import { AppHeader } from '../../components/common/AppHeader';
-import { FormField } from '../../components/forms/FormField';
-import { DynamicListSection } from '../../components/forms/DynamicListSection';
 import { ImagePickerField } from '../../components/forms/ImagePickerField';
-import { SectionContainer } from '../../components/profile/SectionContainer';
 import { Typography } from '../../components/common/Typography';
 import { AppButton } from '../../components/common/AppButton';
 import { saveProfile, setActiveProfile } from '../../redux/slices/profileSlice';
 
-const SUGGESTED_SKILLS = [
-  'React Native',
-  'JavaScript',
-  'TypeScript',
-  'UI/UX Design',
-  'Problem Solving',
-  'Project Management',
-  'Communication',
-  'Team Leadership',
-];
+// Dedicated Section Components for each Profile Type
+import { MatrimonyFormSections } from '../../components/forms/profile-sections/MatrimonyFormSections';
+import { ProfessionalFormSections } from '../../components/forms/profile-sections/ProfessionalFormSections';
+import { StudentFormSections } from '../../components/forms/profile-sections/StudentFormSections';
+import { FreelancerFormSections } from '../../components/forms/profile-sections/FreelancerFormSections';
+import { PortfolioFormSections } from '../../components/forms/profile-sections/PortfolioFormSections';
+import { FamilyFormSections } from '../../components/forms/profile-sections/FamilyFormSections';
 
 export const ProfileFormScreen = ({ route, navigation }) => {
   const dispatch = useDispatch();
@@ -45,40 +35,195 @@ export const ProfileFormScreen = ({ route, navigation }) => {
   );
 
   const activeType = type || existingProfile?.type || 'professional';
-  const isMatrimony = activeType === 'matrimony';
-  const isStudent = activeType === 'student';
 
+  // React Hook Form initialization with comprehensive fields
   const { control, handleSubmit } = useForm({
     defaultValues: {
       name: existingProfile?.name || '',
-      headline: existingProfile?.headline || '',
+      headline:
+        existingProfile?.headline ||
+        existingProfile?.title ||
+        existingProfile?.degree ||
+        existingProfile?.discipline ||
+        '',
       phone: existingProfile?.phone || '',
       email: existingProfile?.email || '',
-      location: existingProfile?.location || '',
-      bio: existingProfile?.bio || '',
+      location: existingProfile?.location || existingProfile?.currentCity || '',
+      bio:
+        existingProfile?.bio ||
+        existingProfile?.aboutMe ||
+        existingProfile?.artistStatement ||
+        '',
+
+      // Matrimonial specific
       age: existingProfile?.age || '',
       height: existingProfile?.height || '',
+      gender: existingProfile?.gender || '',
+      maritalStatus: existingProfile?.maritalStatus || '',
+      languages: existingProfile?.languages || '',
       caste: existingProfile?.caste || '',
       gotra: existingProfile?.gotra || '',
-      company: existingProfile?.company || '',
+      rashi: existingProfile?.rashi || '',
+      nakshatra: existingProfile?.nakshatra || '',
+      manglik: existingProfile?.manglik || '',
+      birthTimePlace: existingProfile?.birthTimePlace || existingProfile?.timeOfBirth || '',
+      highestEducation: existingProfile?.highestEducation || existingProfile?.educationDegree || '',
+      employedIn: existingProfile?.employedIn || '',
+      annualIncome: existingProfile?.annualIncome || '',
+      workLocation: existingProfile?.workLocation || '',
+      fatherName: existingProfile?.fatherName || '',
+      motherName: existingProfile?.motherName || '',
+      familyType: existingProfile?.familyType || '',
+      nativePlace: existingProfile?.nativePlace || '',
+      partnerExpectations: existingProfile?.partnerExpectations || '',
+
+      // Professional / Freelancer / Student
+      company: existingProfile?.company || existingProfile?.employer || '',
       experienceYears: existingProfile?.experienceYears || '',
       portfolioUrl: existingProfile?.portfolioUrl || '',
+      linkedinUrl: existingProfile?.linkedinUrl || '',
+      githubUrl: existingProfile?.githubUrl || '',
+
+      // Student specific
+      degree: existingProfile?.degree || '',
       college: existingProfile?.college || '',
+      semester: existingProfile?.semester || '',
       cgpa: existingProfile?.cgpa || '',
+
+      // Freelancer specific
+      title: existingProfile?.title || '',
+      hourlyRate: existingProfile?.hourlyRate || '',
+      availability: existingProfile?.availability || '',
+
+      // Portfolio specific
+      discipline: existingProfile?.discipline || '',
+      specialization: existingProfile?.specialization || '',
+      websiteUrl: existingProfile?.websiteUrl || '',
+      behanceUrl: existingProfile?.behanceUrl || '',
+      instagramUrl: existingProfile?.instagramUrl || '',
+
+      // Family specific
+      headOfFamily: existingProfile?.headOfFamily || '',
+      currentCity: existingProfile?.currentCity || '',
+      religion: existingProfile?.religion || '',
+      kuladevata: existingProfile?.kuladevata || '',
+      address: existingProfile?.address || '',
     },
   });
 
   const [photoUri, setPhotoUri] = useState(existingProfile?.photoUri || null);
-  const [education, setEducation] = useState(
-    existingProfile?.education || ['B.E. Computer Science']
-  );
-  const [experience, setExperience] = useState(
-    existingProfile?.experience || ['Software Engineer']
-  );
+
+  // Dynamic Lists with smart category defaults
   const [skills, setSkills] = useState(
-    existingProfile?.skills || ['React Native', 'JavaScript', 'Problem Solving']
+    existingProfile?.skills ||
+      (activeType === 'student'
+        ? ['Python', 'Data Structures', 'SQL & DBMS', 'Git & GitHub']
+        : activeType === 'freelancer'
+        ? ['React Native', 'Figma UI/UX', 'Node.js APIs', 'Tailwind CSS']
+        : activeType === 'portfolio'
+        ? ['Blender 3D', 'Figma', 'Visual Direction', 'Motion Graphics']
+        : ['React Native', 'TypeScript', 'System Architecture', 'Agile Leadership'])
   );
-  const [newSkillText, setNewSkillText] = useState('');
+
+  const [education, setEducation] = useState(
+    existingProfile?.education || ['B.E. in Computer Science & Engineering (2018 - 2022)']
+  );
+
+  const [experience, setExperience] = useState(
+    existingProfile?.experience || ['Senior Frontend Engineer at TechCorp (2022 - Present)']
+  );
+
+  const [projects, setProjects] = useState(
+    existingProfile?.projects || [
+      'ProfileCraft App - High performance cross-platform document generator in React Native',
+    ]
+  );
+
+  // Matrimony lists
+  const [siblings, setSiblings] = useState(
+    existingProfile?.siblings || ['1 Younger Brother (Software Engineer at Tech Mahindra, Bengaluru)']
+  );
+
+  const [hobbies, setHobbies] = useState(
+    existingProfile?.hobbies || ['Classical Carnatic Music', 'Reading Non-Fiction', 'Badminton', 'Traveling']
+  );
+
+  // Student lists
+  const [internships, setInternships] = useState(
+    existingProfile?.internships || [
+      'Software Developer Intern at Innovate Labs (Summer 2024) - Built analytics dashboard',
+    ]
+  );
+
+  const [achievements, setAchievements] = useState(
+    existingProfile?.achievements || [
+      'Finalist in Smart India Hackathon 2024',
+      'Department Rank 2 in 6th Semester (9.2 SGPA)',
+    ]
+  );
+
+  // Freelancer lists
+  const [services, setServices] = useState(
+    existingProfile?.services || [
+      'Full-Stack React Native & Mobile App Development',
+      'Figma to Production Code & Design Systems',
+      'App Store Optimization & Cloud Backend Integration',
+    ]
+  );
+
+  const [testimonials, setTestimonials] = useState(
+    existingProfile?.testimonials || [
+      '"Delivered our mobile MVP 2 weeks ahead of target with stellar polish." - David K., FinTech Founder',
+    ]
+  );
+
+  const [caseStudies, setCaseStudies] = useState(
+    existingProfile?.caseStudies || [
+      'E-Commerce Mobile App: Achieved 100K+ installs and 4.9 rating on Google Play',
+    ]
+  );
+
+  // Portfolio lists
+  const [featuredWorks, setFeaturedWorks] = useState(
+    existingProfile?.featuredWorks || [
+      '"Ephemeral Neon" - 3D Cyberpunk Visual Series (2024)',
+      '"Echoes of Clay" - Minimalist Ceramic Brand Identity & Packaging',
+    ]
+  );
+
+  const [exhibitions, setExhibitions] = useState(
+    existingProfile?.exhibitions || [
+      'Kala Ghoda Arts Festival - Digital Installations (Mumbai, 2024)',
+      'Featured Creator Showcase on Behance & Awwwards (2023)',
+    ]
+  );
+
+  // Family lists
+  const [familyMembers, setFamilyMembers] = useState(
+    existingProfile?.familyMembers || [
+      'Dr. Rameshwar Sharma (Father / Head) - Senior Consulting Physician',
+      'Mrs. Sunita Sharma (Mother) - Homemaker & Educationist',
+      'Aakash Sharma (Elder Son) - Lead Architect at Enterprise Corp',
+      'Sneha Sharma (Daughter) - Studying Medicine (MBBS Final Year)',
+    ]
+  );
+
+  const [traditions, setTraditions] = useState(
+    existingProfile?.traditions || [
+      'Annual Diwali Reunion & Family Puja at Ancestral Village',
+      'Ganesh Chaturthi Utsav - 30-year ongoing tradition',
+    ]
+  );
+
+  const [familyValues, setFamilyValues] = useState(
+    existingProfile?.familyValues || [
+      'Joint Family',
+      'Vegetarian',
+      'Higher Education',
+      'Spiritual & Devout',
+      'Community Philanthropy',
+    ]
+  );
 
   const handleImageSelected = (uri) => {
     setPhotoUri(uri);
@@ -88,30 +233,50 @@ export const ProfileFormScreen = ({ route, navigation }) => {
     setPhotoUri(null);
   };
 
-  const handleAddSkill = (skillToAdd) => {
-    const trimmed = (skillToAdd || newSkillText).trim();
-    if (trimmed && !skills.includes(trimmed)) {
-      setSkills([...skills, trimmed]);
-      setNewSkillText('');
-    }
-  };
-
-  const handleRemoveSkill = (skillToRemove) => {
-    setSkills(skills.filter((s) => s !== skillToRemove));
-  };
-
   const onSubmit = (data) => {
+    const defaultTemplate =
+      activeType === 'matrimony'
+        ? 'trad-classic-01'
+        : activeType === 'student'
+        ? 'stud-modern-01'
+        : activeType === 'freelancer'
+        ? 'free-card-01'
+        : activeType === 'portfolio'
+        ? 'port-visual-01'
+        : activeType === 'family'
+        ? 'fam-classic-01'
+        : 'elegant-modern-02';
+
     const profilePayload = {
       id: profileId || `prof-${Date.now()}`,
       type: activeType,
       photoUri,
+      templateId: existingProfile?.templateId || defaultTemplate,
+      // Pass all dynamic lists
+      skills,
       education,
       experience,
-      skills,
-      templateId:
-        existingProfile?.templateId ||
-        (isMatrimony ? 'trad-classic-01' : 'elegant-modern-02'),
+      projects,
+      siblings,
+      hobbies,
+      internships,
+      achievements,
+      services,
+      testimonials,
+      caseStudies,
+      featuredWorks,
+      exhibitions,
+      familyMembers,
+      traditions,
+      familyValues,
       ...data,
+      // Fallback normalization
+      headline:
+        data.headline ||
+        data.title ||
+        data.degree ||
+        data.discipline ||
+        (activeType === 'family' ? `${data.nativePlace || data.currentCity || 'Family'} Lineage & Heritage` : ''),
     };
 
     dispatch(saveProfile(profilePayload));
@@ -132,13 +297,13 @@ export const ProfileFormScreen = ({ route, navigation }) => {
       case 'matrimony':
         return { label: 'Matrimony Biodata', icon: 'heart', color: '#E11D48', bg: '#FFF1F2' };
       case 'student':
-        return { label: 'Student Profile', icon: 'award', color: '#059669', bg: '#ECFDF5' };
+        return { label: 'Student Academic Profile', icon: 'award', color: '#16A34A', bg: '#DCFCE7' };
       case 'freelancer':
-        return { label: 'Freelancer Profile', icon: 'user-check', color: '#7C3AED', bg: '#F5F3FF' };
+        return { label: 'Freelancer / Consultant Profile', icon: 'zap', color: '#9333EA', bg: '#FAF5FF' };
       case 'portfolio':
-        return { label: 'Portfolio Profile', icon: 'file-text', color: '#D97706', bg: '#FFFBEB' };
+        return { label: 'Creative Portfolio Profile', icon: 'compass', color: '#D97706', bg: '#FEF3C7' };
       case 'family':
-        return { label: 'Family Profile', icon: 'users', color: '#0D9488', bg: '#F0FDFA' };
+        return { label: 'Family & Heritage Profile', icon: 'home', color: '#0D9488', bg: '#CCFBF1' };
       default:
         return { label: 'Professional Resume', icon: 'briefcase', color: '#2563EB', bg: '#EFF6FF' };
     }
@@ -191,297 +356,85 @@ export const ProfileFormScreen = ({ route, navigation }) => {
           onImageRemoved={handleImageRemoved}
         />
 
-        {/* 2. Personal & Core Identity Card */}
-        <SectionContainer
-          title="Basic Identity"
-          subtitle="Your primary contact name & title"
-          icon="user"
-          iconBg="#EEF2FF"
-          iconColor={COLORS.primary}
-        >
-          <FormField
+        {/* 2. DYNAMIC APPROPRIATE PROFILE SECTIONS ACCORDING TO TYPE */}
+        {activeType === 'matrimony' && (
+          <MatrimonyFormSections
             control={control}
-            name="name"
-            label="Full Name"
-            required
-            placeholder="e.g. Ananya Sharma"
-            icon="user"
-            rules={{ required: 'Full Name is required' }}
-          />
-
-          <FormField
-            control={control}
-            name="headline"
-            label={isMatrimony ? 'Headline / Brief Title' : 'Professional Headline / Title'}
-            placeholder={
-              isMatrimony
-                ? 'e.g. Software Engineer • Bengaluru'
-                : 'e.g. Senior Frontend Developer'
-            }
-            icon="award"
-          />
-        </SectionContainer>
-
-        {/* 3. Contact Information Card */}
-        <SectionContainer
-          title="Contact & Location"
-          subtitle="Details for correspondence and outreach"
-          icon="phone"
-          iconBg="#E0F2FE"
-          iconColor="#0284C7"
-        >
-          <FormField
-            control={control}
-            name="phone"
-            label="Phone Number"
-            placeholder="e.g. +91 98765 43210"
-            keyboardType="phone-pad"
-            icon="phone"
-          />
-
-          <FormField
-            control={control}
-            name="email"
-            label="Email Address"
-            placeholder="e.g. ananya@example.com"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            icon="mail"
-          />
-
-          <FormField
-            control={control}
-            name="location"
-            label="Current Location / City"
-            placeholder="e.g. Bengaluru, Karnataka"
-            icon="map-pin"
-          />
-        </SectionContainer>
-
-        {/* 4. Type Specific Card */}
-        {isMatrimony && (
-          <SectionContainer
-            title="Matrimonial & Horoscope Details"
-            subtitle="Vital details for biodata matching"
-            icon="heart"
-            iconBg="#FFE4E6"
-            iconColor="#E11D48"
-          >
-            <View style={styles.twoColRow}>
-              <View style={styles.col}>
-                <FormField
-                  control={control}
-                  name="age"
-                  label="Age"
-                  placeholder="e.g. 26 Yrs"
-                  icon="calendar"
-                />
-              </View>
-              <View style={styles.col}>
-                <FormField
-                  control={control}
-                  name="height"
-                  label="Height"
-                  placeholder="e.g. 5'4''"
-                  icon="maximize-2"
-                />
-              </View>
-            </View>
-
-            <FormField
-              control={control}
-              name="caste"
-              label="Community / Religion"
-              placeholder="e.g. Hindu - Brahmin"
-              icon="users"
-            />
-
-            <FormField
-              control={control}
-              name="gotra"
-              label="Gothra / Nakshatra"
-              placeholder="e.g. Kashyapa / Rohini"
-              icon="star"
-            />
-          </SectionContainer>
-        )}
-
-        {isStudent && (
-          <SectionContainer
-            title="Academic Information"
-            subtitle="Current university or college progress"
-            icon="book-open"
-            iconBg="#DCFCE7"
-            iconColor="#15803D"
-          >
-            <FormField
-              control={control}
-              name="college"
-              label="Institution / University"
-              placeholder="e.g. Delhi Technological University"
-              icon="book"
-            />
-
-            <FormField
-              control={control}
-              name="cgpa"
-              label="CGPA / Percentage"
-              placeholder="e.g. 8.8 CGPA"
-              icon="award"
-            />
-          </SectionContainer>
-        )}
-
-        {!isMatrimony && !isStudent && (
-          <SectionContainer
-            title="Work & Portfolio Links"
-            subtitle="Online presence and career highlights"
-            icon="briefcase"
-            iconBg="#F3E8FF"
-            iconColor="#7E22CE"
-          >
-            <FormField
-              control={control}
-              name="company"
-              label="Current Organization / Client"
-              placeholder="e.g. Microsoft / Freelance"
-              icon="briefcase"
-            />
-
-            <FormField
-              control={control}
-              name="portfolioUrl"
-              label="Portfolio / LinkedIn URL"
-              placeholder="e.g. linkedin.com/in/ananya"
-              icon="globe"
-              autoCapitalize="none"
-            />
-          </SectionContainer>
-        )}
-
-        {/* 5. About Me / Bio Card */}
-        <SectionContainer
-          title="About & Introduction"
-          subtitle="A brief summary about who you are"
-          icon="edit-3"
-          iconBg="#FEF3C7"
-          iconColor="#D97706"
-        >
-          <FormField
-            control={control}
-            name="bio"
-            label="About Me / Summary"
-            placeholder="Write a warm, authentic introduction about yourself..."
-            multiline
-            numberOfLines={4}
-            helperText="3-5 sentences highlighting your qualities, passion, or background."
-          />
-        </SectionContainer>
-
-        {/* 6. Education Dynamic Section */}
-        <DynamicListSection
-          title="Education"
-          subtitle="Schools, degrees & certifications"
-          icon="book"
-          iconBg="#EEF2FF"
-          iconColor={COLORS.primary}
-          items={education}
-          onChangeItems={setEducation}
-          placeholder="Degree / School"
-        />
-
-        {/* 7. Experience Dynamic Section (if not matrimony) */}
-        {!isMatrimony && (
-          <DynamicListSection
-            title="Experience"
-            subtitle="Previous roles, positions & companies"
-            icon="briefcase"
-            iconBg="#F0FDF4"
-            iconColor="#16A34A"
-            items={experience}
-            onChangeItems={setExperience}
-            placeholder="Role & Company"
+            siblings={siblings}
+            setSiblings={setSiblings}
+            hobbies={hobbies}
+            setHobbies={setHobbies}
           />
         )}
 
-        {/* 8. Skills & Expertise Card */}
-        <SectionContainer
-          title="Skills & Expertise"
-          subtitle="Add key strengths to stand out"
-          icon="zap"
-          iconBg="#FEF9C3"
-          iconColor="#CA8A04"
-        >
-          {/* Tag Cloud */}
-          <View style={styles.tagCloud}>
-            {skills.map((skill, index) => (
-              <View key={`skill-${index}`} style={styles.skillTag}>
-                <Typography variant="caption" bold color={COLORS.primaryDark}>
-                  {skill}
-                </Typography>
-                <TouchableOpacity
-                  onPress={() => handleRemoveSkill(skill)}
-                  style={styles.tagRemoveBtn}
-                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                >
-                  <Feather name="x" size={13} color={COLORS.primaryDark} />
-                </TouchableOpacity>
-              </View>
-            ))}
-          </View>
+        {activeType === 'professional' && (
+          <ProfessionalFormSections
+            control={control}
+            experience={experience}
+            setExperience={setExperience}
+            education={education}
+            setEducation={setEducation}
+            skills={skills}
+            setSkills={setSkills}
+            projects={projects}
+            setProjects={setProjects}
+          />
+        )}
 
-          {/* Add Skill Row */}
-          <View style={styles.addSkillRow}>
-            <View style={styles.skillInputWrap}>
-              <TextInput
-                value={newSkillText}
-                onChangeText={setNewSkillText}
-                placeholder="Add a new skill..."
-                placeholderTextColor="#94A3B8"
-                style={styles.skillTextInput}
-                onSubmitEditing={() => handleAddSkill()}
-              />
-            </View>
-            <TouchableOpacity
-              style={[
-                styles.addSkillBtn,
-                !newSkillText.trim() && styles.addSkillBtnDisabled,
-              ]}
-              onPress={() => handleAddSkill()}
-              disabled={!newSkillText.trim()}
-              activeOpacity={0.7}
-            >
-              <Feather name="plus" size={16} color="#FFF" />
-            </TouchableOpacity>
-          </View>
+        {activeType === 'student' && (
+          <StudentFormSections
+            control={control}
+            projects={projects}
+            setProjects={setProjects}
+            internships={internships}
+            setInternships={setInternships}
+            achievements={achievements}
+            setAchievements={setAchievements}
+            skills={skills}
+            setSkills={setSkills}
+          />
+        )}
 
-          {/* Suggestions */}
-          <View style={styles.suggestionsWrap}>
-            <Typography variant="caption" color={COLORS.textMuted} style={styles.suggLabel}>
-              Quick suggestions:
-            </Typography>
-            <View style={styles.suggPills}>
-              {SUGGESTED_SKILLS.filter((s) => !skills.includes(s))
-                .slice(0, 4)
-                .map((s, idx) => (
-                  <TouchableOpacity
-                    key={idx}
-                    onPress={() => handleAddSkill(s)}
-                    style={styles.suggPill}
-                    activeOpacity={0.7}
-                  >
-                    <Feather name="plus" size={11} color={COLORS.primary} style={styles.suggPlus} />
-                    <Typography variant="caption" color={COLORS.primary}>
-                      {s}
-                    </Typography>
-                  </TouchableOpacity>
-                ))}
-            </View>
-          </View>
-        </SectionContainer>
+        {activeType === 'freelancer' && (
+          <FreelancerFormSections
+            control={control}
+            services={services}
+            setServices={setServices}
+            testimonials={testimonials}
+            setTestimonials={setTestimonials}
+            caseStudies={caseStudies}
+            setCaseStudies={setCaseStudies}
+            skills={skills}
+            setSkills={setSkills}
+          />
+        )}
+
+        {activeType === 'portfolio' && (
+          <PortfolioFormSections
+            control={control}
+            featuredWorks={featuredWorks}
+            setFeaturedWorks={setFeaturedWorks}
+            exhibitions={exhibitions}
+            setExhibitions={setExhibitions}
+            skills={skills}
+            setSkills={setSkills}
+          />
+        )}
+
+        {activeType === 'family' && (
+          <FamilyFormSections
+            control={control}
+            familyMembers={familyMembers}
+            setFamilyMembers={setFamilyMembers}
+            traditions={traditions}
+            setTraditions={setTraditions}
+            familyValues={familyValues}
+            setFamilyValues={setFamilyValues}
+          />
+        )}
       </ScrollView>
 
-      {/* Floating Bottom Action Bar */}
+      {/* Single Fixed Bottom Floating Action Bar */}
       <View
         style={[
           styles.bottomBar,
@@ -547,90 +500,6 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: COLORS.primary,
     borderRadius: 2,
-  },
-  twoColRow: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  col: {
-    flex: 1,
-  },
-  tagCloud: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: SPACING.sm,
-  },
-  skillTag: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#EEF2FF',
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: RADIUS.full,
-    borderWidth: 1,
-    borderColor: '#C7D2FE',
-  },
-  tagRemoveBtn: {
-    marginLeft: 6,
-    padding: 2,
-  },
-  addSkillRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: SPACING.xs,
-    gap: 8,
-  },
-  skillInputWrap: {
-    flex: 1,
-    height: 44,
-    backgroundColor: '#F8FAFC',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    borderRadius: RADIUS.md,
-    paddingHorizontal: SPACING.sm + 4,
-    justifyContent: 'center',
-  },
-  skillTextInput: {
-    fontSize: 13.5,
-    color: COLORS.textPrimary,
-    paddingVertical: 0,
-  },
-  addSkillBtn: {
-    width: 44,
-    height: 44,
-    backgroundColor: COLORS.primary,
-    borderRadius: RADIUS.md,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  addSkillBtnDisabled: {
-    backgroundColor: '#CBD5E1',
-  },
-  suggestionsWrap: {
-    marginTop: SPACING.sm + 4,
-  },
-  suggLabel: {
-    fontSize: 11,
-    marginBottom: 6,
-  },
-  suggPills: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 6,
-  },
-  suggPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F8FAFC',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: RADIUS.full,
-  },
-  suggPlus: {
-    marginRight: 3,
   },
   bottomBar: {
     position: 'absolute',
